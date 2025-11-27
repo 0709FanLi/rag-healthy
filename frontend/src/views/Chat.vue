@@ -193,16 +193,35 @@
           </template>
         </div>
         
-        <!-- AI 思考中 -->
-        <div v-if="loading" class="message-wrapper assistant">
-          <div class="message-bubble">
-            <div class="message-content thinking">
-              <div class="thinking-dots">
-                <span></span><span></span><span></span>
+        <!-- AI 思考中 - 精美 Loading -->
+        <div v-if="loading" class="ai-loading-container">
+          <div class="loading-card">
+            <!-- 旋转动画 -->
+            <div class="loading-spinner-wrapper">
+              <div class="spinner-ring"></div>
+              <div class="spinner-ring"></div>
+              <div class="spinner-ring"></div>
+              <div class="spinner-core">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="#8B7FE5"/>
+                </svg>
               </div>
             </div>
+            
+            <!-- 动态提示文字 -->
+            <div class="loading-text-container">
+              <h3 class="loading-title">{{ loadingTitle }}</h3>
+              <p class="loading-subtitle">{{ loadingSubtitle }}</p>
+            </div>
+            
+            <!-- 进度提示 -->
+            <div class="loading-progress">
+              <div class="progress-bar">
+                <div class="progress-fill"></div>
+              </div>
+              <span class="progress-hint">预计需要 3-5 秒</span>
+            </div>
           </div>
-          <div class="message-avatar"></div>
         </div>
       </div>
       
@@ -265,6 +284,11 @@ const showReport = ref(false) // 是否显示报告
 const reportData = ref(null) // 报告数据
 const showProducts = ref(false) // 是否显示产品列表
 const reportLoading = ref(false) // 报告生成中
+
+// Loading 动态文字
+const loadingTitle = ref('正在分析您的健康状况')
+const loadingSubtitle = ref('AI 正在为您生成个性化问题...')
+const loadingTextIndex = ref(0)
 
 // 历史对话列表（从后端获取）
 const historyItems = ref([])
@@ -378,6 +402,34 @@ const startNewChat = async () => {
   }
 }
 
+// Loading 文字轮换
+const loadingTexts = [
+  { title: '正在分析您的健康状况', subtitle: 'AI 正在为您生成个性化问题...' },
+  { title: '深度理解您的需求', subtitle: '根据您的回答定制专属问卷...' },
+  { title: '智能匹配健康方案', subtitle: '这可能需要几秒钟，请稍候...' }
+]
+
+let loadingInterval = null
+
+const startLoadingAnimation = () => {
+  loadingTextIndex.value = 0
+  loadingTitle.value = loadingTexts[0].title
+  loadingSubtitle.value = loadingTexts[0].subtitle
+  
+  loadingInterval = setInterval(() => {
+    loadingTextIndex.value = (loadingTextIndex.value + 1) % loadingTexts.length
+    loadingTitle.value = loadingTexts[loadingTextIndex.value].title
+    loadingSubtitle.value = loadingTexts[loadingTextIndex.value].subtitle
+  }, 2000)
+}
+
+const stopLoadingAnimation = () => {
+  if (loadingInterval) {
+    clearInterval(loadingInterval)
+    loadingInterval = null
+  }
+}
+
 const sendMessage = async () => {
   if (!inputMessage.value.trim() || loading.value) return
   
@@ -387,6 +439,8 @@ const sendMessage = async () => {
   scrollToBottom()
   
   loading.value = true
+  startLoadingAnimation()
+  
   try {
     const res = await request.post('/chat/message', {
       session_id: sessionId.value,
@@ -415,6 +469,7 @@ const sendMessage = async () => {
     ElMessage.error('发送失败，请重试')
   } finally {
     loading.value = false
+    stopLoadingAnimation()
   }
 }
 
@@ -904,44 +959,196 @@ onMounted(async () => {
     background: linear-gradient(135deg, #8B7FE5 0%, #6750A4 100%);
 }
 
-/* 思考动画 */
-.thinking {
+/* ========== AI Loading 精美动画 ========== */
+.ai-loading-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8F7FC 100%);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 
+    0 8px 32px rgba(139, 127, 229, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  border: 1px solid rgba(139, 127, 229, 0.1);
+}
+
+/* 旋转动画容器 */
+.loading-spinner-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #8E8E93;
+  justify-content: center;
 }
 
-.thinking-dots {
-  display: flex;
-  gap: 4px;
-}
-
-.thinking-dots span {
-  width: 6px;
-  height: 6px;
+.spinner-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: #8E8E93;
-  animation: thinking 1.4s infinite;
+  border: 3px solid transparent;
+  animation: spinRing 2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
-.thinking-dots span:nth-child(2) {
-  animation-delay: 0.2s;
+.spinner-ring:nth-child(1) {
+  border-top-color: #8B7FE5;
+  animation-delay: 0s;
 }
 
-.thinking-dots span:nth-child(3) {
-  animation-delay: 0.4s;
+.spinner-ring:nth-child(2) {
+  width: 85%;
+  height: 85%;
+  border-top-color: #A89FF5;
+  animation-delay: 0.15s;
 }
 
-@keyframes thinking {
-  0%, 60%, 100% {
-    opacity: 0.3;
-    transform: scale(0.8);
+.spinner-ring:nth-child(3) {
+  width: 70%;
+  height: 70%;
+  border-top-color: #C5BFF8;
+  animation-delay: 0.3s;
 }
-  30% {
-    opacity: 1;
+
+@keyframes spinRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-core {
+  position: relative;
+  z-index: 10;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #8B7FE5 0%, #6750A4 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 4px 16px rgba(139, 127, 229, 0.4),
+    inset 0 2px 8px rgba(255, 255, 255, 0.2);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
     transform: scale(1);
+    box-shadow: 
+      0 4px 16px rgba(139, 127, 229, 0.4),
+      inset 0 2px 8px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 
+      0 6px 24px rgba(139, 127, 229, 0.6),
+      inset 0 2px 8px rgba(255, 255, 255, 0.3);
+  }
 }
+
+/* 文字容器 */
+.loading-text-container {
+  text-align: center;
+  animation: textFade 2s ease-in-out infinite;
+}
+
+@keyframes textFade {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.loading-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1C1C1E;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #6750A4 0%, #8B7FE5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.loading-subtitle {
+  font-size: 15px;
+  color: #8E8E93;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 进度提示 */
+.loading-progress {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #E5E5EA;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8B7FE5 0%, #A89FF5 50%, #8B7FE5 100%);
+  background-size: 200% 100%;
+  animation: progressSlide 2s linear infinite;
+  border-radius: 2px;
+}
+
+@keyframes progressSlide {
+  0% {
+    width: 0%;
+    background-position: 0% 0%;
+  }
+  50% {
+    width: 70%;
+    background-position: 100% 0%;
+  }
+  100% {
+    width: 100%;
+    background-position: 200% 0%;
+  }
+}
+
+.progress-hint {
+  font-size: 13px;
+  color: #A0A0A8;
+  text-align: center;
 }
 
 /* ========== 报告显示区域 ========== */

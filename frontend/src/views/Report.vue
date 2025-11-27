@@ -16,11 +16,11 @@
       <div class="sidebar-content" v-show="!sidebarCollapsed">
         <!-- 开始新对话 -->
         <button class="new-chat-btn" @click="startNewChat">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
+        </svg>
           <span>开始新对话</span>
-        </button>
+      </button>
         
         <!-- 查看历史报告 -->
         <button class="history-btn" @click="viewHistory">
@@ -69,35 +69,35 @@
       <!-- 顶部导航栏 -->
       <div class="top-nav">
         <div class="header-left"></div>
-        <h1 class="page-title">查看历史报告</h1>
-        <div class="user-info">
+      <h1 class="page-title">查看历史报告</h1>
+      <div class="user-info">
           <span class="username">{{ user.username || 'Lana' }}</span>
-          <div class="avatar">
-            <img v-if="user.avatar" :src="user.avatar" alt="avatar" />
-            <div v-else class="avatar-placeholder">{{ (user.username || 'L')[0].toUpperCase() }}</div>
-          </div>
+        <div class="avatar">
+          <img v-if="user.avatar" :src="user.avatar" alt="avatar" />
+          <div v-else class="avatar-placeholder">{{ (user.username || 'L')[0].toUpperCase() }}</div>
         </div>
       </div>
+    </div>
 
-      <!-- 主体内容 -->
-      <div class="page-content">
-        <!-- Loading 状态 -->
-        <div v-if="loading" class="loading-container">
-          <div class="loading-spinner"></div>
-          <p>报告生成中，请稍候...</p>
-        </div>
+    <!-- 主体内容 -->
+    <div class="page-content">
+      <!-- Loading 状态 -->
+      <div v-if="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>报告生成中，请稍候...</p>
+      </div>
 
-        <!-- 报告内容 -->
-        <div v-else-if="report && reportContent.html" class="report-wrapper">
-          <!-- HTML报告区域（红框部分） -->
-          <div class="html-report-area" v-html="reportContent.html"></div>
+      <!-- 报告内容 -->
+      <div v-else-if="report && reportContent.html" class="report-wrapper">
+        <!-- HTML报告区域（红框部分） -->
+        <div class="html-report-area" v-html="reportContent.html"></div>
 
           <!-- 底部商品推荐区 -->
-          <div class="products-section">
-            <!-- 免责声明 -->
-            <div class="disclaimer-text">
-              *本报告仅供参考，不作为医学诊断依据
-            </div>
+        <div class="products-section">
+          <!-- 免责声明 -->
+          <div class="disclaimer-text">
+            *本报告仅供参考，不作为医学诊断依据
+          </div>
 
             <!-- 初始状态：推荐产品按钮 + 左侧图标 -->
             <div v-if="!showProducts" class="recommend-trigger">
@@ -132,50 +132,50 @@
 
             <!-- 展开状态：产品列表 + 换一换按钮 -->
             <div v-else class="products-expanded">
-              <!-- 换一换按钮 -->
-              <div class="products-header">
-                <div class="change-products">
+          <!-- 换一换按钮 -->
+          <div class="products-header">
+            <div class="change-products">
                   <button class="change-btn" @click="changeProducts">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                      <path d="M21 3V8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    换一换
-                  </button>
-                </div>
-              </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M21 3V8H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                换一换
+              </button>
+            </div>
+          </div>
 
-              <!-- 商品卡片 -->
-              <div class="products-grid">
-                <div v-for="i in 3" :key="i" class="product-card">
-                  <!-- 占位图 -->
-                  <div class="product-image-placeholder">
-                    <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
-                      <circle cx="50" cy="35" r="12" fill="#C7C7CC"/>
-                      <path d="M30 70C30 60 40 55 50 55C60 55 70 60 70 70" fill="#C7C7CC"/>
-                      <rect x="65" y="65" width="20" height="20" rx="4" fill="#C7C7CC"/>
-                    </svg>
-                  </div>
-                  <div class="product-info">
-                    <h4 class="product-title">保健品名称</h4>
-                    <p class="product-desc">这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字</p>
-                    <div class="product-actions">
-                      <button class="view-details-btn">查看详情</button>
-                      <button class="buy-now-btn">去购买</button>
+          <!-- 商品卡片 -->
+          <div class="products-grid">
+            <div v-for="i in 3" :key="i" class="product-card">
+              <!-- 占位图 -->
+              <div class="product-image-placeholder">
+                <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                  <circle cx="50" cy="35" r="12" fill="#C7C7CC"/>
+                  <path d="M30 70C30 60 40 55 50 55C60 55 70 60 70 70" fill="#C7C7CC"/>
+                  <rect x="65" y="65" width="20" height="20" rx="4" fill="#C7C7CC"/>
+                </svg>
+              </div>
+              <div class="product-info">
+                <h4 class="product-title">保健品名称</h4>
+                <p class="product-desc">这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字这是一段产品介绍文字</p>
+                <div class="product-actions">
+                  <button class="view-details-btn">查看详情</button>
+                  <button class="buy-now-btn">去购买</button>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- 错误状态 -->
-        <div v-else class="empty-state">
-          <p>暂无报告数据</p>
-          <button class="retry-btn" @click="fetchReport">重试</button>
-        </div>
       </div>
+
+      <!-- 错误状态 -->
+      <div v-else class="empty-state">
+        <p>暂无报告数据</p>
+        <button class="retry-btn" @click="fetchReport">重试</button>
+      </div>
+    </div>
     </main>
   </div>
 </template>
